@@ -2,7 +2,7 @@ import { env } from "@/env";
 import { tryCatch, tryCatchSync } from "@/lib/try-catch";
 import { type ApiResponse } from "@/lib/types/api-response";
 import { db } from "@/server/db";
-import { stripeClient } from "@/server/stripe";
+import { getStripeClient } from "@/server/stripe";
 import { CreditTransactionType, OrderStatus, Prisma, UserStatus } from "@prisma/client";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   const signature = headersList.get("stripe-signature");
 
   const { data: event, error } = tryCatchSync(() =>
-    stripeClient.webhooks.constructEvent(body, signature!, env.STRIPE_WEBHOOK_SECRET)
+    getStripeClient().webhooks.constructEvent(body, signature!, env.STRIPE_WEBHOOK_SECRET)
   );
   if (error) {
     console.error("Stripe webhook signature verification failed:", error);

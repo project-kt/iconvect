@@ -1,6 +1,10 @@
 import { env } from "@/env";
 import Stripe from "stripe";
 
-export const stripeClient = new Stripe(env.STRIPE_SECRET_KEY, {
-  typescript: true
-});
+let stripeClientInstance: Stripe | null = null;
+
+export const getStripeClient = () => {
+  return (stripeClientInstance ??= new Stripe(env.STRIPE_SECRET_KEY ?? "dummy_key_for_build", {
+    typescript: true
+  }));
+};

@@ -1,5 +1,5 @@
 import { apiUrl } from "@/lib/constants";
-import { stripeClient } from "@/server/stripe";
+import { getStripeClient } from "@/server/stripe";
 import { TRPCError } from "@trpc/server";
 import Stripe from "stripe";
 import { z } from "zod";
@@ -11,7 +11,7 @@ export const stripeRouter = createTRPCRouter({
   prices: publicProcedure.output(z.array(z.custom<Stripe.Price>())).query(async () => {
     const fetchPricesCached = cache(async () => {
       const { data: prices, error } = await tryCatch(
-        stripeClient.prices.list({
+        getStripeClient().prices.list({
           active: true,
           type: "one_time",
           currency: "eur",
@@ -73,7 +73,7 @@ export const stripeRouter = createTRPCRouter({
 
       // 1. Retrieve price
       const { data: price, error: priceError } = await tryCatch(
-        stripeClient.prices.retrieve(priceId, { expand: ["product"] })
+        getStripeClient().prices.retrieve(priceId, { expand: ["product"] })
       );
       if (priceError) {
         console.error("Stripe error retrieving price:", priceError);
@@ -116,7 +116,7 @@ export const stripeRouter = createTRPCRouter({
 
       // 2. Create checkout session
       const { data: checkoutSession, error: sessionError } = await tryCatch(
-        stripeClient.checkout.sessions.create({
+        getStripeClient().checkout.sessions.create({
           payment_method_types: ["card", "paypal"],
           mode: "payment",
           line_items: [

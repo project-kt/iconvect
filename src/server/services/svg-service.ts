@@ -2,8 +2,8 @@ import { type ICONVECT_AI_MODELS } from "@/lib/constants";
 import { tryCatch } from "@/lib/try-catch";
 import { type GenerationConfig, HarmBlockThreshold, HarmCategory } from "@google/genai";
 import OpenAI from "openai";
-import { geminiClient } from "../gemini";
-import { openaiClient } from "../openai";
+import { getGeminiClient } from "../gemini";
+import { getOpenaiClient } from "../openai";
 
 const systemInstruction = `
 Act as an SVG code generator. Strict rules to be followed:
@@ -29,7 +29,7 @@ export const svgService = {
   geminiSvg: async (model: ICONVECT_AI_MODELS, prompt: string) => {
     // 1. Generate SVG with Gemini
     const { data: result, error: geminiError } = await tryCatch(
-      geminiClient.models.generateContent({
+      getGeminiClient().models.generateContent({
         model: model,
         contents: {
           role: "user",
@@ -70,7 +70,7 @@ export const svgService = {
 
   openaiSvg: async (model: ICONVECT_AI_MODELS, prompt: string) => {
     const { data: completion, error: openAiError } = await tryCatch(
-      openaiClient.chat.completions.create({
+      getOpenaiClient().chat.completions.create({
         model: model,
         messages: [
           {

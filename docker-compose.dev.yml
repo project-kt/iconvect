@@ -1,0 +1,27 @@
+name: iconvect-dev
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    # Load environment variables from .env file on the VPS
+    env_file:
+      - .env
+    
+    networks:
+      - traefik-public
+      - default
+
+    labels:
+      - "traefik.enable=true"
+      # Router configuration for DEV domain
+      - "traefik.http.routers.iconvect-dev.rule=Host(`dev.iconvect.com`)"
+      - "traefik.http.routers.iconvect-dev.entrypoints=websecure"
+      - "traefik.http.routers.iconvect-dev.tls.certresolver=myresolver"
+      # Service configuration
+      - "traefik.http.services.iconvect-dev.loadbalancer.server.port=3000"
+
+networks:
+  traefik-public:
+    external: true

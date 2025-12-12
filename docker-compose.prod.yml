@@ -1,0 +1,49 @@
+name: iconvect-prod
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    # No ports mapping needed if using Traefik (it routes internally via the network)
+    # ports:
+    #   - "3000:3000"
+    
+    # Point to environment variables set on the VPS (Host OS)
+    environment:
+      - NEXT_PUBLIC_API_URL
+      - AUTH_SECRET
+      - AUTH_TRUST_HOST
+      - AUTH_GITHUB_ID
+      - AUTH_GITHUB_SECRET
+      - GOOGLE_CLIENT_ID
+      - GOOGLE_CLIENT_SECRET
+      - OPENAI_API_KEY
+      - OPENAI_ORGANIZATION
+      - OPENAI_PROJECT
+      - GOOGLE_API_KEY
+      - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+      - STRIPE_SECRET_KEY
+      - STRIPE_WEBHOOK_SECRET
+      - NEXT_PUBLIC_POSTHOG_KEY
+      - NEXT_PUBLIC_POSTHOG_HOST
+      - DATABASE_URL
+      # Ensure NEXTAUTH_URL is set on the VPS to your actual domain (e.g., https://iconvect.com)
+      - NEXTAUTH_URL
+
+    networks:
+      - traefik-public
+      - default
+
+    labels:
+      - "traefik.enable=true"
+      # Router configuration
+      - "traefik.http.routers.iconvect.rule=Host(`iconvect.com`)"
+      - "traefik.http.routers.iconvect.entrypoints=websecure"
+      - "traefik.http.routers.iconvect.tls.certresolver=myresolver"
+      # Service configuration
+      - "traefik.http.services.iconvect.loadbalancer.server.port=3000"
+
+networks:
+  traefik-public:
+    external: true

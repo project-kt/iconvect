@@ -1,0 +1,39 @@
+name: iconvect-local
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+        NEXT_PUBLIC_POSTHOG_KEY: ${NEXT_PUBLIC_POSTHOG_KEY}
+        NEXT_PUBLIC_POSTHOG_HOST: ${NEXT_PUBLIC_POSTHOG_HOST}
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+    networks:
+      - iconvect-network
+
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: iconvect
+      POSTGRES_PASSWORD: iconvect
+      POSTGRES_DB: iconvect
+    volumes:
+      - iconvect-pgdata:/var/lib/postgresql/data
+    networks:
+      - iconvect-network
+
+networks:
+  iconvect-network:
+    driver: bridge
+
+volumes:
+  iconvect-pgdata:
