@@ -10,6 +10,8 @@ import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import Providers from "./providers";
 import IubendaConsentSolution from "@/components/iubenda-consent-solution";
+import { EnvDebugger } from "@/components/env-debugger";
+import { logServerEnv } from "@/lib/log-env";
 
 export const metadata: Metadata = {
   title: siteConfig.name,
@@ -45,6 +47,9 @@ export const metadata: Metadata = {
   }
 };
 
+// Log server env variables (server-side only)
+logServerEnv();
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable} h-dvh w-full`} suppressHydrationWarning={true}>
@@ -53,14 +58,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <IubendaConsentSolution />
       </head>
       <body>
-        <Providers>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            <Navbar />
-            <div className="mt-20">{children}</div>
-            <Footer />
-            <AuthModal />
-          </ThemeProvider>
-        </Providers>
+          <Providers>
+            <EnvDebugger />
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+              <Navbar />
+              <div className="mt-20">{children}</div>
+              <Footer />
+              <AuthModal />
+            </ThemeProvider>
+          </Providers>
       </body>
     </html>
   );
